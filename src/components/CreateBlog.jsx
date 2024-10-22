@@ -11,7 +11,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Editor from 'react-simple-wysiwyg';
-import {useState} from "react";
+import { useState} from "react";
+
+
 
 function CreateBlog() {
     const [value, setValue] = useState('simple text');
