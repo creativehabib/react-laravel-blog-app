@@ -1,32 +1,27 @@
 import BlogCard from "./BlogCard.jsx";
 import {Link} from "react-router-dom";
 import {Button} from "@/components/ui/button.jsx";
-import {useEffect, useState} from "react";
+import useFetch from "react-fetch-hook";
+
 
 function Blogs() {
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { data: posts, isLoading, error } = useFetch('http://laravelapi.test/api/blog');
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    // Show a loading message while data is fetching
+    if (isLoading) {
+        return <h2>Loading...</h2>;
+    }
 
-    const fetchData = async () => {
-        try {
-            const response = await fetch('http://laravelapi.test/api/blogs'); // Replace with your API endpoint
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-            const data = await response.json();
-            console.log(data.data);
-            setData(data);
-            setLoading(false);
-        } catch (error) {
-            setError(error.message);
-            setLoading(false);
-        }
-    };
+    // Handle error
+    if (error) {
+        return <div className="error">Error: {error.message}</div>;
+    }
+
+    // Ensure the data structure is correct before mapping
+    if (!posts || !posts.data || !posts.data.data) {
+        return <div>No posts available.</div>;
+    }
+
     return (
         <>
             <div className="container mx-auto px-8">
@@ -36,23 +31,17 @@ function Blogs() {
                 </div>
                 <div className="flex-row mt-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {loading ? (
+                        {isLoading ? (
                             <p>Loading...</p>
                         ) : error ? (
                             <p>Error: {error}</p>
                         ) : (
-                            <ul>
-                                {data.map((item) => (
-                                    <li key={item.id}>{item.name}</li>
+                            <>
+                                {posts.data.data.map((item) => (
+                                    <BlogCard key={item.id} item={item} />
                                 ))}
-                            </ul>
+                            </>
                         )}
-                        <BlogCard/>
-                        <BlogCard/>
-                        <BlogCard/>
-                        <BlogCard/>
-                        <BlogCard/>
-                        <BlogCard/>
                     </div>
                 </div>
             </div>
